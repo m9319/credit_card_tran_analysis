@@ -93,7 +93,7 @@ UPDATE credit_card_transactions_india
 SET tran_month =
 	CASE
 		WHEN LENGTH(substring_index(tran_date,'-',1)) = 2 THEN RIGHT(substring_index(tran_date,'-',2),3)
-        WHEN LENGTH(substring_index(tran_date,'-',1)) = 1 THEN RIGHT(substring_index(tran_date,'-',2),3)
+        	WHEN LENGTH(substring_index(tran_date,'-',1)) = 1 THEN RIGHT(substring_index(tran_date,'-',2),3)
 	END;
 
 
@@ -105,17 +105,17 @@ UPDATE credit_card_transactions_india
 SET tran_month =
 	CASE
 		WHEN tran_month = 'Jan' THEN 01
-        WHEN tran_month = 'Feb' THEN 02
-        WHEN tran_month = 'Mar' THEN 03
-        WHEN tran_month = 'Apr' THEN 04
-        WHEN tran_month = 'May' THEN 05
-        WHEN tran_month = 'Jun' THEN 06
-        WHEN tran_month = 'Jul' THEN 07
-        WHEN tran_month = 'Aug' THEN 08
-        WHEN tran_month = 'Sep' THEN 09
-        WHEN tran_month = 'Oct' THEN 10
-        WHEN tran_month = 'Nov' THEN 11
-        WHEN tran_month = 'Dec' THEN 12
+        	WHEN tran_month = 'Feb' THEN 02
+	        WHEN tran_month = 'Mar' THEN 03
+	        WHEN tran_month = 'Apr' THEN 04
+	        WHEN tran_month = 'May' THEN 05
+	        WHEN tran_month = 'Jun' THEN 06
+	        WHEN tran_month = 'Jul' THEN 07
+	        WHEN tran_month = 'Aug' THEN 08
+	        WHEN tran_month = 'Sep' THEN 09
+	        WHEN tran_month = 'Oct' THEN 10
+	        WHEN tran_month = 'Nov' THEN 11
+	        WHEN tran_month = 'Dec' THEN 12
 	END;
 
 SELECT * FROM credit_card_transactions_india;
@@ -127,7 +127,7 @@ UPDATE credit_card_transactions_india
 SET tran_month =
 	CASE
 		WHEN LENGTH(tran_month) = 2 THEN tran_month
-        WHEN LENGTH(tran_month) = 1 THEN CONCAT(0,tran_month)
+        	WHEN LENGTH(tran_month) = 1 THEN CONCAT(0,tran_month)
 	END;
 
 
@@ -204,7 +204,7 @@ SELECT * FROM credit_card_transactions_india;
 
 SELECT
 	city,
-    SUM(amount) AS amt
+    	SUM(amount) AS amt
 FROM 
 	credit_card_transactions_india
 GROUP BY
@@ -229,27 +229,27 @@ SELECT
 COUNT(
 	CASE
 		WHEN card_type = 'Gold' THEN 1 
-        ELSE NULL
+        	ELSE NULL
 	END
-	   ) AS 'Gold', -- creates a pivot table with columns for gold, (in the following statements) silver, platinum, signature
+     ) AS 'Gold', -- creates a pivot table with columns for gold, (in the following statements) silver, platinum, signature
 COUNT(
 	CASE
 		WHEN card_type = 'Silver' THEN 1
-        ELSE NULL
+        	ELSE NULL
 	END
-	  ) AS 'Silver',
+     ) AS 'Silver',
 COUNT(
 	CASE
 		WHEN card_type = 'Signature' THEN 1
-        ELSE NULL
+        	ELSE NULL
 	END
-	  ) AS 'Signature',
+     ) AS 'Signature',
 COUNT(
 	CASE
 		WHEN card_type = 'Platinum' THEN 1
-        ELSE NULL
+        	ELSE NULL
 	END
-	  ) AS 'Platinum'
+     ) AS 'Platinum'
 FROM
 	credit_card_transactions_india
 GROUP BY
@@ -260,8 +260,8 @@ LIMIT 10;
 -- DA Q4. - Write a query to print highest spend month and amount spent in that month for each card type
 
 SELECT
-	card_type,
-	tran_year,
+    card_type,
+    tran_year,
     highest_spend_month,
     amount_spent
     
@@ -287,14 +287,15 @@ FROM
 		card_type,
         tran_year,
         highest_spend_month
-)  AS highest_spend_rank -- the subquery creates a table which groups the partitions the data by card_type,
--- groups the data by card_type, tran_year, tran_month and orders the data by the highest amount first
+)  AS highest_spend_rank  /* the subquery creates a table which groups the partitions the data by card_type, groups the data by card_type,
+                	  -- tran_year, tran_month and orders the data by the highest amount first */
 
-WHERE spend_rank = 1
+WHERE
+	spend_rank = 1
 GROUP BY 
 	card_type,
 	tran_year,
-    highest_spend_month
+    	highest_spend_month
 ORDER BY
     amount_spent DESC;
 
@@ -313,9 +314,11 @@ WITH E_high AS
 		RANK() OVER (
 			PARTITION BY city
 			ORDER BY SUM(amount) DESC
-			) AS highest_expense_type 
+			    ) AS highest_expense_type 
 	FROM credit_card_transactions_india
-	GROUP BY city, expense_type
+	GROUP BY 
+		city, 
+		expense_type
 ),
 
 -- to find the lowest expense
@@ -329,7 +332,7 @@ E_low AS
 		RANK() OVER (
 			PARTITION BY city
 			ORDER BY SUM(amount) ASC
-			) AS lowest_expense_type
+			    ) AS lowest_expense_type
 	FROM credit_card_transactions_india
 	GROUP BY city, expense_type
 )
@@ -354,21 +357,23 @@ ORDER BY city;
 SELECT * FROM credit_card_transactions_india;
 
 
-WITH fivehun_tran_date AS (
+WITH fivehun_tran_date AS
+	(
 
 SELECT
 	*,
-    ROW_NUMBER() OVER (
+    	ROW_NUMBER() OVER (
 		PARTITION BY city
         ORDER BY tran_date) AS rn
-FROM credit_card_transactions_india) -- to rank transactions according to each city from 1 to the max. num of transactions
+FROM credit_card_transactions_india
+	) -- to rank transactions according to each city from 1 to the max. num of transactions
 
 
 SELECT
 	city,
---     MIN(tran_date) AS first_tran_date,
---     MAX(tran_date) AS five_hundredth_tran_date,
-    DATEDIFF(MAX(tran_date), MIN(tran_date)) AS days_to_500_transactions
+/*     	MIN(tran_date) AS first_tran_date,
+     	MAX(tran_date) AS five_hundredth_tran_date, 	*/
+    	DATEDIFF(MAX(tran_date), MIN(tran_date)) AS days_to_500_transactions
 	
 FROM fivehun_tran_date
 WHERE rn in (1,500)
@@ -382,22 +387,22 @@ LIMIT 1;
 SELECT 
  	city,
 	card_type, 
-    expenses
+    	expenses
 FROM (  SELECT
- 			city,
-			card_type,
-			SUM(amount) AS expenses,
-             RANK() OVER
-             (
- 				PARTITION BY city
-				ORDER BY SUM(amount) ASC
-			 ) AS rnk_exp -- ranks the expenditure for each city from l,owest to highest
- 		FROM
-			credit_card_transactions_india
-		GROUP BY 
-			city,
-            card_type
-	 ) AS rnk_expenses
+ 		city,
+		card_type,
+		SUM(amount) AS expenses,
+             	RANK() OVER
+             		(
+ 			PARTITION BY city
+			ORDER BY SUM(amount) ASC
+			) AS rnk_exp -- ranks the expenditure for each city from l,owest to highest
+ 	FROM
+		credit_card_transactions_india
+	GROUP BY 
+		city,
+            	card_type
+     ) AS rnk_expenses
 WHERE 
 	rnk_exp = 1 -- to get the minimum value of expenditure for each city
 GROUP BY
