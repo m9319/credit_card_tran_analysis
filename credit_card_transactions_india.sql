@@ -118,7 +118,7 @@ SET tran_month =
 	        WHEN tran_month = 'Dec' THEN 12
 	END;
 
-SELECT * FROM credit_card_transactions_india;
+SELECT * FROM credit_card_transactions_india; -- O/P - The months from Jan to Sep are shown as 1,2,.... till 9 and not 01, 02.... 09
 
 -- DC 3B IV) Adding a 0 for Jan to Sep months
 
@@ -396,7 +396,7 @@ FROM (  SELECT
              		(
  			PARTITION BY city
 			ORDER BY SUM(amount) ASC
-			) AS rnk_exp -- ranks the expenditure for each city from l,owest to highest
+			) AS rnk_exp -- ranks the expenditure for each city from lowest to highest
  	FROM
 		credit_card_transactions_india
 	GROUP BY 
